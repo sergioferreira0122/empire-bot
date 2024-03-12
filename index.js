@@ -1,5 +1,7 @@
 const io = require('socket.io-client');
 const axios = require('axios');
+const { newItemHandler } = require('./handlers/newItemHandler');
+const { auctionUpdateHandler } = require('./handlers/auctionUpdateHandler');
 
 let balance = 0;
 
@@ -22,8 +24,6 @@ async function initSocket() {
     try {
         // Get the user data from the socket
         const userData = (await axios.get(`https://${domain}/api/v2/metadata/socket`)).data;
-
-        balance = userData.user.balance
 
         // Initalize socket connection
         const socket = io(
@@ -50,7 +50,7 @@ async function initSocket() {
                     
                     // Emit the default filters to ensure we receive events
                     socket.emit('filters', {
-                        price_max: 9999999999
+                        price_max: 99999999
                     });
                     
                 } else {
@@ -67,7 +67,7 @@ async function initSocket() {
             // Listen for the following event to be emitted by the socket after we've identified the user
             //socket.on('timesync', (data) => console.log(`Timesync: ${JSON.stringify(data)}`));
             socket.on('new_item', (data) => newItemHandler(data));
-            socket.on('updated_item', (data) => updatedItemHandler(data));
+            //socket.on('updated_item', (data) => updatedItemHandler(data));
             socket.on('auction_update', (data) => auctionUpdateHandler(data));
             //socket.on('deleted_item', (data) => console.log(`deleted_item: ${JSON.stringify(data)}`));
             //socket.on('trade_status', (data) => console.log(`trade_status: ${JSON.stringify(data)}`));
@@ -84,18 +84,20 @@ async function initSocket() {
     }
 };
 
-function newItemHandler(data) {
-    //console.log(`new_item: ${JSON.stringify(data)}`)
+async function updateBalance() {
+    setInterval(async () => {
+        try {
+            const userData = (await axios.get(`https://${domain}/api/v2/metadata/socket`)).data;
+
+            balance = userData.user.balance;
+
+            console.log("Balance updated:", balance);
+        } catch (error) {
+            console.error("Error fetching socket data:", error);
+        }
+    }, 60000); //1 minute
 }
 
-function updatedItemHandler(data) {
-    //console.log(`updated_item: ${JSON.stringify(data)}`)
-}
-
-async function auctionUpdateHandler(data) {
-    console.log(`auction_update: ${JSON.stringify(data)}`)
-
-    console.log(balance)
-}
+updateBalance();
 
 initSocket();

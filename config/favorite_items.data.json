@@ -1,0 +1,38 @@
+[
+    {
+        "name": "Operation Phoenix Weapon Case",
+        "max_price": 358
+    },
+    {
+        "name": "Kilowatt Case",
+        "max_price": 360
+    },
+    {
+        "name": "Clutch Case",
+        "max_price": 80
+    },
+    {
+        "name": "Operation Wildfire Case",
+        "max_price": 300
+    },
+    {
+        "name": "Dreams & Nightmares Case",
+        "max_price": 150
+    },
+    {
+        "name": "Operation Wildfire Case",
+        "max_price": 300
+    },
+    {
+        "name": "Revolution Case",
+        "max_price": 100
+    },
+    {
+        "name": "CS20 Case",
+        "max_price": 80
+    },
+    {
+        "name": "Chroma 3 Case",
+        "max_price": 260
+    }
+]
