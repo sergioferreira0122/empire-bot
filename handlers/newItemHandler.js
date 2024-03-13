@@ -1,14 +1,15 @@
 const fs = require('fs');
+const balance = require('../utils/balance')
+const axios = require('axios');
+require('dotenv').config();
+
+const csgoempireApiKey = process.env.API_KEY;
+
+const domain = process.env.DOMAIN
 
 let favoriteItems = []
 
-async function saveToFile(data) {
-    const newData = JSON.stringify(data) + '\n';
-    fs.appendFile('./data/new_items.data.json', newData, { flag: 'a' }, (err) => {
-        if (err) throw err;
-        //console.log('New Item.');
-    });
-}
+let biddedItems = []
 
 function loadFromFile(path) {
     try {
@@ -29,13 +30,35 @@ async function isFavoriteItemAndGoodPrice(name, purchase_price) {
     return false;
 }
 
+async function placeBid(itemId, bidValue) {
+    try {
+        await axios.post(`https://${domain}/api/v2/trading/deposit/${itemId}/bid`, {
+            bid_value: bidValue
+        }, {
+            headers: {
+                Authorization: `Bearer ${csgoempireApiKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Bid placed successfully:');
+        return true;
+    } catch (error) {
+        console.error('Error placing bid:');
+        return false;
+    }
+}
+
 async function newItemHandler(data) {
-    saveToFile(data);
-    
     for (const element of data) {
         const favoriteItem = await isFavoriteItemAndGoodPrice(element.market_name, element.purchase_price);
         if (favoriteItem) {
             console.log(`[NEW_ITEM] ${element.market_name} is a favorite item and has a good price ${element.purchase_price}.`);
+
+            if (element.purchase_price <= balance.balance) {
+                await placeBid(element.id, element.purchase_price);
+            }
+
         }
     }
 }

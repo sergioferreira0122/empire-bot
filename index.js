@@ -1,6 +1,5 @@
 const io = require('socket.io-client');
 const axios = require('axios');
-const balance = require('./utils/balance')
 const { newItemHandler } = require('./handlers/newItemHandler');
 const { auctionUpdateHandler } = require('./handlers/auctionUpdateHandler');
 require('dotenv').config();
@@ -35,7 +34,6 @@ async function initSocket() {
         socket.on('connect', async () => {
 
             console.log(`Connected to websocket`);
-            console.log(balance.balance)
 
             socket.on('init', (data) => {
                 if (data && data.authenticated) {
