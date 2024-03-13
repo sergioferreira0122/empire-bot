@@ -5,8 +5,6 @@ require('dotenv').config();
 
 const csgoempireApiKey = process.env.API_KEY;
 
-const domain = process.env.DOMAIN
-
 let favoriteItems = []
 
 let biddedItems = []
@@ -24,15 +22,15 @@ function loadFromFile(path) {
 async function isFavoriteItemAndGoodPrice(name, purchase_price) {
     for (const element of favoriteItems) {
         if (element.name === name && element.max_price >= purchase_price) {
-            return true;
+            return element;
         }
     }
-    return false;
+    return null;
 }
 
 async function placeBid(itemId, bidValue) {
     try {
-        await axios.post(`https://${domain}/api/v2/trading/deposit/${itemId}/bid`, {
+        await axios.post(`https://csgoempire.com/api/v2/trading/deposit/${itemId}/bid`, {
             bid_value: bidValue
         }, {
             headers: {
@@ -52,11 +50,14 @@ async function placeBid(itemId, bidValue) {
 async function newItemHandler(data) {
     for (const element of data) {
         const favoriteItem = await isFavoriteItemAndGoodPrice(element.market_name, element.purchase_price);
-        if (favoriteItem) {
+        if (favoriteItem != null) {
             console.log(`[NEW_ITEM] ${element.market_name} is a favorite item and has a good price ${element.purchase_price}.`);
 
             if (element.purchase_price <= balance.balance) {
                 await placeBid(element.id, element.purchase_price);
+
+                let biddedItem = {id: element.id, max_price: favoriteItem.max_price}
+                biddedItems.push(biddedItem);
             }
 
         }
@@ -65,4 +66,7 @@ async function newItemHandler(data) {
 
 loadFromFile('./config/favorite_items.data.json');
 
-exports.newItemHandler = newItemHandler;
+module.exports = {
+    newItemHandler,
+    biddedItems
+};
