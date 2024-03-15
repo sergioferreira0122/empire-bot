@@ -1,6 +1,30 @@
 [
     {
-        "name": "Revolution Case",
-        "max_price": 46
+        "name": "Dreams & Nightmares Case",
+        "max_price": 95
+    },
+    {
+        "name": "AK-47 | Elite Build (Field-Tested)",
+        "max_price": 135
+    },
+    {
+        "name": "Kilowatt Case",
+        "max_price": 285
+    },
+    {
+        "name": "AK-47 | Slate (Battle-Scarred)",
+        "max_price": 280
+    },
+    {
+        "name": "Shadow Case",
+        "max_price": 102
+    },
+    {
+        "name": "Gamma 2 Case",
+        "max_price": 239
+    },
+    {
+        "name": "Operation Phoenix Weapon Case",
+        "max_price": 316
     }
 ]

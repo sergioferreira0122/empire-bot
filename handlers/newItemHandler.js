@@ -43,7 +43,8 @@ async function placeBid(itemId, bidValue) {
         console.log('Bid placed successfully');
         return true;
     } catch (error) {
-        console.error('Error placing bid');
+        console.error('Error placing bid:');
+        console.error(error.response.data.message);
         return false;
     }
 }
@@ -64,7 +65,7 @@ async function newItemHandler(data) {
             const statusBid = await placeBid(element.id, element.purchase_price);
 
             if (statusBid) {
-                let biddedItem = {id: element.id, max_price: favoriteItem.max_price}
+                let biddedItem = {description: element.market_name, id: element.id, max_price: favoriteItem.max_price}
                 biddedItems.push(biddedItem);
 
                 saveBidToFile({description: element.market_name, id: element.id, value: element.purchase_price})

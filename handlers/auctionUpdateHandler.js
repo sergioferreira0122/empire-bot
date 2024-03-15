@@ -19,7 +19,8 @@ async function placeBid(itemId, bidValue) {
         console.log('Bid placed successfully');
         return true;
     } catch (error) {
-        console.error('Error placing bid');
+        console.error('Error placing bid:')
+        console.error(error.response.data.message);
         return false;
     }
 }
@@ -49,14 +50,14 @@ async function auctionUpdateHandler(data) {
     for (const element of data) {
         for (const biddedItem of biddedItems) {
             if (element.id === biddedItem.id && element.auction_highest_bid <= biddedItem.max_price) {
-                console.log(`[AUCTION_UPDATE] ${element.market_name} is a favorite item and has a good price ${element.auction_highest_bid}.`);
+                console.log(`[AUCTION_UPDATE] ${biddedItem.description} is a favorite item and has a good price ${element.auction_highest_bid}.`);
     
-                const newValue = calculateNextBid(element.auction_highest_bid);
+                const newValue = await calculateNextBid(element.auction_highest_bid);
 
                 const statusBid = await placeBid(element.id, newValue);
     
                 if (statusBid) {
-                    saveBidToFile({description: element.market_name, id: element.id, value: element.purchase_price})
+                    saveBidToFile({description: biddedItem.description, id: element.id, value: newValue})
                 }
             }
         }
