@@ -1,5 +1,4 @@
 const fs = require('fs');
-const balance = require('../utils/balance')
 const axios = require('axios');
 require('dotenv').config();
 
@@ -20,6 +19,8 @@ function loadFromFile(path) {
 }
 
 async function isFavoriteItemAndGoodPrice(name, purchase_price) {
+    loadFromFile('./config/favorite_items.data.json');
+
     for (const element of favoriteItems) {
         if (element.name === name && element.max_price >= purchase_price) {
             return element;
@@ -39,12 +40,19 @@ async function placeBid(itemId, bidValue) {
             }
         });
 
-        console.log('Bid placed successfully:');
+        console.log('Bid placed successfully');
         return true;
     } catch (error) {
-        console.error('Error placing bid:');
+        console.error('Error placing bid');
         return false;
     }
+}
+
+async function saveBidToFile(data) {
+    const newData = JSON.stringify(data) + '\n';
+    fs.appendFile('./bids/items_bids.data.json', newData, { flag: 'a' }, (err) => {
+        if (err) throw err;
+    });
 }
 
 async function newItemHandler(data) {
@@ -53,18 +61,18 @@ async function newItemHandler(data) {
         if (favoriteItem != null) {
             console.log(`[NEW_ITEM] ${element.market_name} is a favorite item and has a good price ${element.purchase_price}.`);
 
-            if (element.purchase_price <= balance.balance) {
-                await placeBid(element.id, element.purchase_price);
+            const statusBid = await placeBid(element.id, element.purchase_price);
 
+            if (statusBid) {
                 let biddedItem = {id: element.id, max_price: favoriteItem.max_price}
                 biddedItems.push(biddedItem);
-            }
 
+                saveBidToFile({description: element.market_name, id: element.id, value: element.purchase_price})
+            }
+            
         }
     }
 }
-
-loadFromFile('./config/favorite_items.data.json');
 
 module.exports = {
     newItemHandler,
